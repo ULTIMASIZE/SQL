@@ -1,9 +1,17 @@
 WITH casos_filtrados AS (
-  SELECT *,
-         ROW_NUMBER() OVER (PARTITION BY pz_ins_key ORDER BY cstone_last_updatetm DESC) AS rn
+  SELECT 
+    pz_ins_key,
+    cstone_last_updatetm,
+    trans_id,
+    trans_am,
+    ROW_NUMBER() OVER (PARTITION BY pz_ins_key ORDER BY cstone_last_updatetm DESC) AS rn
   FROM nombre_de_tu_tabla
-  WHERE pz_ins_key IN ('CASO001', 'CASO002', 'CASO003') -- Reemplaza con tus casos reales
+  WHERE pz_ins_key IN ('CASO001', 'CASO002', 'CASO003')
 )
-SELECT *
+SELECT 
+  pz_ins_key,
+  cstone_last_updatetm,
+  trans_id,
+  trans_am
 FROM casos_filtrados
 WHERE rn = 1;
