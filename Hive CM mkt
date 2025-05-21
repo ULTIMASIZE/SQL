@@ -1,0 +1,32 @@
+-- CTE para obtener último registro por caso desde la tabla principal
+WITH casos_filtrados AS (
+  SELECT 
+    pz_ins_key,
+    cstone_last_updatetm,
+    trans_id,
+    trans_am,
+    ROW_NUMBER() OVER (PARTITION BY pz_ins_key ORDER BY cstone_last_updatetm DESC) AS rn
+  FROM `tu_dataset.nombre_de_tu_tabla`
+  WHERE pz_ins_key IN ('CASO001', 'CASO002', 'CASO003')
+),
+
+-- CTE para obtener último mkt_cd por caso desde la tabla_cm_mkt
+mkt_filtrado AS (
+  SELECT 
+    pz_ins_key,
+    mkt_cd,
+    ROW_NUMBER() OVER (PARTITION BY pz_ins_key ORDER BY cstone_last_updatetm DESC) AS rn
+  FROM `tu_dataset.tabla_cm_mkt`
+)
+
+-- Join de ambos resultados finales
+SELECT 
+  cf.pz_ins_key,
+  cf.cstone_last_updatetm,
+  cf.trans_id,
+  cf.trans_am,
+  mk.mkt_cd
+FROM casos_filtrados cf
+LEFT JOIN mkt_filtrado mk
+  ON cf.pz_ins_key = mk.pz_ins_key AND mk.rn = 1
+WHERE cf.rn = 1;
